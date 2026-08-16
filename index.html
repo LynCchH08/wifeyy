@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Do You Love Me? 💌</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+  :root{
+    --blush:#f3c6ce;
+    --cream:#fdf1ee;
+    --rose:#d46a7e;
+    --deep-rose:#9c2b45;
+    --plum:#5c2436;
+    --gold:#c98a52;
+    --paper:#fdf5f0;
+    --shadow: rgba(156,43,69,0.2);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:'Quicksand', sans-serif;
+    background:var(--cream);
+    color:var(--plum);
+    overflow:hidden;
+  }
+
+  /* ---------- SCREENS ---------- */
+  .screen-stage{
+    position:relative;
+    z-index:1;
+    height:100vh;
+    width:100vw;
+    overflow:hidden;
+  }
+
+  .screen{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:22px;
+    padding:50px 24px;
+    text-align:center;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .screen.active{
+    display:flex;
+    animation: screenIn 0.55s ease;
+  }
+  @keyframes screenIn{
+    0%{ opacity:0; transform:translateY(18px); }
+    100%{ opacity:1; transform:translateY(0); }
+  }
+
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--rose);
+    font-weight:700;
+  }
+
+  h1.question, h2.big-title{
+    font-family:'Dancing Script', cursive;
+    font-weight:700;
+    font-size:clamp(36px, 8vw, 58px);
+    margin:0;
+    color:var(--deep-rose);
+    line-height:1.1;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+  }
+
+  .gif-frame{
+    width:200px;
+    height:200px;
+    border-radius:50%;
+    border:6px solid #fff;
+    box-shadow:0 15px 30px var(--shadow);
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f7e6ea;
+  }
+  .gif-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position: 60% center;
+  }
+  .gif-frame .placeholder-txt{
+    font-size:13px;
+    color:#b98a94;
+    text-align:center;
+    padding:12px;
+    line-height:1.4;
+  }
+
+  .btn-row{
+    position:relative;
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    align-items:center;
+    min-height:80px;
+  }
+
+  .love-btn{
+    font-family:'Quicksand',sans-serif;
+    font-weight:700;
+    font-size:18px;
+    padding:16px 38px;
+    border-radius:50px;
+    border:none;
+    cursor:pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .primary-btn{
+    background: linear-gradient(135deg, var(--rose), var(--deep-rose));
+    color:#fff;
+    box-shadow:0 10px 22px var(--shadow);
+  }
+  .primary-btn:hover{ transform:translateY(-2px) scale(1.04); }
+  .primary-btn:active{ transform:translateY(0) scale(0.98); }
+
+  .outline-btn{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:12px 30px;
+    border-radius:50px;
+    border:2px solid var(--blush);
+    background:#fff;
+    color:var(--deep-rose);
+    cursor:pointer;
+    transition: all 0.2s ease;
+  }
+  .outline-btn:hover{ background:var(--deep-rose); color:#fff; }
+
+  /* ---------- envelope ---------- */
+  .envelope{
+    width:260px;
+    height:180px;
+    position:relative;
+    cursor:pointer;
+  }
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background: linear-gradient(180deg, #f2c6cd, var(--blush));
+    border-radius:10px;
+    box-shadow:0 15px 30px var(--shadow);
+    overflow:hidden;
+  }
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:96px;
+    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
+    clip-path: polygon(0 0, 100% 0, 50% 78%);
+    transform-origin:top center;
+    transition: transform 0.6s cubic-bezier(.6,-0.28,.74,.05);
+    z-index:3;
+  }
+  .envelope.open .envelope-flap{ transform: rotateX(180deg); }
+
+  .envelope-heart-seal{
+    position:absolute;
+    top:32px; left:50%;
+    transform:translateX(-50%);
+    font-size:24px;
+    z-index:4;
+    color:var(--gold);
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+    transition:opacity 0.3s ease;
+  }
+  .envelope.open .envelope-heart-seal{ opacity:0; }
+
+  .letter-inside{
+    position:absolute;
+    left:50%;
+    bottom:8px;
+    transform:translate(-50%, 0);
+    width:88%;
+    height:68%;
+    background:var(--paper);
+    border-radius:6px;
+    box-shadow:0 -4px 10px rgba(0,0,0,0.05);
+    z-index:2;
+    transition: transform 0.6s ease 0.15s;
+    padding:14px;
+    font-size:12px;
+    color:var(--plum);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .envelope.open .letter-inside{ transform:translate(-50%, -150%); }
+
+  /* ---------- letter screen ---------- */
+  .letter-paper{
+    background:var(--paper);
+    max-width:460px;
+    width:100%;
+    padding:30px 26px;
+    border-radius:6px;
+    box-shadow:0 25px 50px rgba(0,0,0,0.18);
+    font-family:'Quicksand', sans-serif;
+    line-height:1.7;
+    color:var(--plum);
+    text-align:left;
+  }
+  .letter-paper h3{
+    font-family:'Dancing Script', cursive;
+    font-size:28px;
+    color:var(--deep-rose);
+    margin-top:0;
+    text-align:center;
+  }
+  .music-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--deep-rose);
+    background:#f2dde3;
+    padding:6px 12px;
+    border-radius:20px;
+    margin-bottom:6px;
+  }
+  .music-note-icon{
+    display:inline-block;
+    animation: sway 1.4s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{ transform: rotate(-8deg); }
+    50%{ transform: rotate(8deg); }
+  }
+
+  footer{
+    font-size:12px;
+    color:var(--plum);
+    text-align:center;
+  }
+
+  .scroll-hint{
+    font-size:11px;
+    color:#b98a94;
+  }
+
+  .end-btn-wrap{
+    display:flex;
+    justify-content:center;
+    margin-top:8px;
+  }
+
+  .video-wrap{
+    display:none;
+    width:100%;
+    max-width:460px;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    animation: screenIn 0.5s ease;
+  }
+  .video-wrap.show{ display:flex; }
+  .love-video{
+    width:100%;
+    max-width:460px;
+    border-radius:10px;
+    box-shadow:0 15px 30px var(--shadow);
+    background:#000;
+    display:block;
+  }
+  .video-placeholder{
+    display:none;
+    font-size:13px;
+    color:#b98a94;
+    text-align:center;
+    padding:12px;
+    background:#f2dde3;
+    border-radius:8px;
+    width:100%;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-stage">
+
+  <!-- SCREEN 1: INTRO -->
+  <section class="screen active" id="screen-question">
+    <span class="eyebrow">for youuu</span>
+    <h1 class="question">Hii wifey ko, I have something for you</h1>
+
+    <div class="gif-frame">
+      <img src="wifey.png" alt="us" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    </div>
+
+    <div class="btn-row">
+      <button class="love-btn primary-btn" onclick="showScreen('screen-gift')">Proceed</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: I HAVE SOMETHING FOR YOU -->
+  <section class="screen" id="screen-gift">
+    <span class="eyebrow">wait, there's more</span>
+    <h2 class="big-title">I have something for you</h2>
+    <button class="love-btn primary-btn" onclick="showScreen('screen-envelope')">Open</button>
+  </section>
+
+  <!-- SCREEN 4: ENVELOPE -->
+  <section class="screen" id="screen-envelope">
+    <span class="eyebrow">for you</span>
+    <div class="envelope" id="envelope">
+      <div class="letter-inside"><span>your letter is inside ✉️</span></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-heart-seal">❤</div>
+    </div>
+    <button class="outline-btn" onclick="openLetterFlow()">Open the letter</button>
+  </section>
+
+  <!-- SCREEN 5: LETTER -->
+  <section class="screen" id="screen-letter">
+    <div class="music-tag">
+      <span class="music-note-icon">🎵</span>
+      <span id="musicLabel">now playing our song</span>
+    </div>
+
+    <div class="letter-paper">
+      <h3>HIIII LABLABBBBBBBB.</h3>
+      <p>Me againnn, your one and only wifeyyy. I just wanna remind you po how much I love youuu. I love you ebrisecond, ebriminute, ebrihour, ebriday and ebrilifetime my lablabbbb.</p>
+      <p>I'm so so proud of you sa lahat ng ginagawa mo, kahit sa mga bagay na feeling mo so little lang or hindi enough. I see how hard you try lablab and that makes me so proud of you.</p>
+      <p>Always remember na nandito lang ako for you, always and poriber. You can tell me anythinggg, your rants, problems, random chikas, little stories, achievements, worries, or kahit mga walang kwentang bagay HAHAHAHA. I'll always listen to you lablab. I'll never get tired of hearing about your day or knowing what's going on in your little world.</p>
+      <p>I want you to always feel na you have a safe place in me. You can be yourself, you can be vulnerable, you can tell me when you're not okay and you don't have to pretend na everything is fine. I'll stay and listen, kahit paulit-ulit pa yan. Just like you became my safe place, I want to be yours too.</p>
+      <p>I'm sorry rin po if sometimes nasasabay ako kapag hindi ka okay or nagiging sensitive ako, especially when it comes to you. Mahal na mahal kasi talaga kita, and sometimes my emotions get the best of me. I know na may times na instead na mapagaan ko yung nararamdaman mo, nakakadagdag pa ako, and I'm really sorry for that. I'm always trying to understand you better and learn how to handle things more calmly, not just for myself but for us too. I don't want my love to ever feel heavy or suffocating for you. I want my love to be your comfort, your safe place and a place where you can always feel at home.</p>
+      <p>You did great ebriday lablabbbb. You're doing better than you think you are. Even on days na feeling mo wala kang nagawa or you weren't at your best, please remember na I'm still proud of you. You don't always have to be strong or productive. You're allowed to rest too. So please eat properly, drink lots of water, get enough sleep and take care of yourself for meee, okay?</p>
+      <p>And lastly, never ever forget how special you are to me. I'm so lucky na ikaw yung mahal ko, ikaw yung kausap ko, ikaw yung gusto kong makasama and ikaw yung pipiliin(pili pili mwhehehehehe) ko every single day.</p>
+      <p><strong>I LOVE YOU SO MUCH MORE THAN WORDS CAN EXPLAIN MY LABLABBBBB. MWAAAAAAAAAA</strong></p>
+      <p style="text-align:center; font-weight:700; color:var(--deep-rose);">Always remember, your wifey is here, always and poriber.</p>
+    </div>
+
+    <div class="end-btn-wrap">
+      <button class="love-btn primary-btn" id="revealBtn" onclick="goToVideo()">I love youuuuuuuu</button>
+    </div>
+
+    <footer>made just for you</footer>
+  </section>
+
+  <!-- SCREEN 6: VIDEO -->
+  <section class="screen" id="screen-video">
+    <span class="eyebrow">one more thing</span>
+    <h2 class="big-title" style="font-size:32px;">for youuu</h2>
+
+    <div class="video-wrap show">
+      <video id="loveVideo" class="love-video" controls playsinline>
+        <source src="video.mp4" type="video/mp4">
+      </video>
+      <p class="placeholder-txt video-placeholder" id="videoPlaceholder">video didn't load — replace "our-video.mp4" with your video file</p>
+    </div>
+
+    <div class="end-btn-wrap">
+      <button class="love-btn primary-btn" onclick="backToLetter()">Back</button>
+    </div>
+
+    <footer>made just for you</footer>
+  </section>
+
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="halintulad.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  // ---------- screen navigation ----------
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ---------- go to video screen ----------
+  function goToVideo(){
+    showScreen('screen-video');
+    const loveVideo = document.getElementById('loveVideo');
+    loveVideo.play().catch(()=>{});
+  }
+
+  const loveVideoEl = document.getElementById('loveVideo');
+  loveVideoEl.addEventListener('error', function(){
+    loveVideoEl.style.display = 'none';
+    document.getElementById('videoPlaceholder').style.display = 'block';
+  });
+  loveVideoEl.addEventListener('play', function(){
+    bgMusic.pause();
+  });
+
+  function backToLetter(){
+    loveVideoEl.pause();
+    showScreen('screen-letter');
+    bgMusic.play().catch(()=>{});
+  }
+
+  // ---------- envelope + letter flow ----------
+  const bgMusic = document.getElementById('bgMusic');
+
+  function openLetterFlow(){
+    const envelope = document.getElementById('envelope');
+    envelope.classList.add('open');
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(()=>{});
+    setTimeout(()=>{
+      showScreen('screen-letter');
+    }, 750);
+  }
+</script>
+
+</body>
+</html>
